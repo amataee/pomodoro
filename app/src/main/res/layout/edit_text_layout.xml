@@ -5,24 +5,15 @@
 
 
     <EditText
-        android:id="@+id/focusEditText"
+        android:id="@+id/timeEditText"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginStart="16dp"
         android:layout_marginEnd="8dp"
         android:layout_weight="1"
+        android:maxLength="3"
+        android:backgroundTint="@color/light_green"
         android:ems="10"
-        android:hint="@string/focus_time"
         android:inputType="time" />
 
-    <EditText
-        android:id="@+id/breakEditText"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginStart="8dp"
-        android:layout_marginEnd="16dp"
-        android:layout_weight="1"
-        android:ems="10"
-        android:hint="@string/break_time"
-        android:inputType="time" />
 </LinearLayout>
