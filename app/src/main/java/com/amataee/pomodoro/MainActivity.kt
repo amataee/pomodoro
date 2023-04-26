@@ -7,7 +7,12 @@ import android.os.Bundle
 import android.os.CountDownTimer
 import android.os.VibrationEffect
 import android.os.Vibrator
+import android.transition.Slide
+import android.transition.TransitionManager
 import android.util.Log
+import android.view.Gravity
+import android.view.View
+import android.view.ViewGroup
 import android.view.WindowManager
 import android.widget.Button
 import android.widget.EditText
@@ -15,6 +20,7 @@ import android.widget.TextView
 import androidx.appcompat.app.AppCompatActivity
 import com.google.android.material.floatingactionbutton.FloatingActionButton
 import androidx.annotation.RequiresApi
+import androidx.core.view.isVisible
 
 class MainActivity : AppCompatActivity() {
 
@@ -29,6 +35,8 @@ class MainActivity : AppCompatActivity() {
 
     private var focusTime = 50
     private var breakTime = 10
+
+    private val transition = Slide(Gravity.TOP)
 
     @RequiresApi(Build.VERSION_CODES.Q)
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -66,14 +74,18 @@ class MainActivity : AppCompatActivity() {
 
     }
 
-    private fun setButton(button: Button, isEnabled: Boolean, isClickable: Boolean) {
-        button.isEnabled = isEnabled
-        button.isClickable = isClickable
+    private fun View.slideVisibility(visibility: Boolean, durationTime: Long = 400) {
+        transition.apply {
+            duration = durationTime
+            addTarget(this@slideVisibility)
+        }
+        TransitionManager.beginDelayedTransition(this.parent as ViewGroup, transition)
+        this.isVisible = visibility
     }
 
     private fun vibrate() {
         val v = (getSystemService(Context.VIBRATOR_SERVICE) as Vibrator)
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
             v.vibrate(
                 VibrationEffect.createOneShot(
                     1200,
@@ -88,7 +100,7 @@ class MainActivity : AppCompatActivity() {
     private fun showEditTextDialog() {
         val builder = AlertDialog.Builder(this)
         val inflater = layoutInflater
-        val dialogLayout = inflater.inflate(R.layout.edit_text_layout, null)
+        val dialogLayout = inflater.inflate(R.layout.dialog_layout, null)
         val timeEditText = dialogLayout.findViewById<EditText>(R.id.timeEditText)
 
         with(builder) {
@@ -105,9 +117,9 @@ class MainActivity : AppCompatActivity() {
     }
 
     private fun startTimer() {
-        setButton(focusButton, isEnabled = false, isClickable = false)
-        setButton(breakButton, isEnabled = false, isClickable = false)
-        settingsFab.isClickable = false
+        settingsFab.slideVisibility(false)
+        breakButton.slideVisibility(false)
+        focusButton.slideVisibility(false)
 
         var time = 0L
         time = if (timeLeftInMillis == 0L) {
@@ -137,9 +149,10 @@ class MainActivity : AppCompatActivity() {
 
     private fun stopTimer() {
         if (isTimerRunning) {
-            setButton(focusButton, isEnabled = true, isClickable = true)
-            setButton(breakButton, isEnabled = true, isClickable = true)
-            settingsFab.isClickable = true
+            settingsFab.slideVisibility(true)
+            breakButton.slideVisibility(true)
+            focusButton.slideVisibility(true)
+
             countDownTimer.cancel()
             isTimerRunning = false
         }
